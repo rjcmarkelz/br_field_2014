@@ -410,3 +410,54 @@ plotfruits5 <- plotfruits5 + theme(axis.title=element_text(face="bold",
 plotfruits5
 setwd("~/git.repos/brassica_field_2014/output/")
 ggsave(plotfruits5, file="brassica_fruits_2014.png", width=15, height=8)
+
+#######
+#fruit set
+#######
+library(lme4)
+head(field_2014)
+plot()
+
+fruitnumber_lmer3 <- lmer(pod.number ~ density_trt*RIL.x 
+	              + (1|blk), data = field_data, REML = FALSE)
+fruitnumber_lmer3
+
+library(lmerTest)
+fruits_lsmeans <- lsmeans(fruitnumber_lmer3)
+fruits_lsmeans
+
+head(fruits_lsmeans)dd
+fruits_lsmeans_1 <- as.data.frame(fruits_lsmeans[[1]])
+head(fruits_lsmeans_1)
+
+fruits_lsmeans_1$rows <- 1:nrow(fruits_lsmeans_1)
+fruits_lsmeans_1
+fruits_lsmeans_2 <- subset(fruits_lsmeans_1, rows > 18)
+str(fruits_lsmeans_2)
+
+fruits_lsmeans_2$density_trt <- relevel(fruits_lsmeans_2$density_trt, ref = "UN")
+colnames(fruits_lsmeans_2)[5] <- paste("SE")
+head(fruits_lsmeans_2)
+
+fruits_un <- subset(fruits_lsmeans_2, density_trt == "UN")
+fruits_cr <- subset(fruits_lsmeans_2, density_trt == "CR")
+head(fruits_un)
+
+fruits <- merge(fruits_un, fruits_cr, by = "RIL.x")
+head(fruits)
+colnames(fruits)[c(3,12)] <- paste(c("UN_fruits", "CR_fruits"))
+
+
+plot(fruits$UN_fruits)
+ggplot(fruits, aes(x=UN_fruits, y=CR_fruits)) +
+    geom_point(shape=1) +    # Use hollow circles
+    geom_smooth(method=lm)  +  
+    geom_abline(intercept = 0, colour = "red", size = 1) +
+    scale_y_continuous(limits=c(0, 400)) +
+    scale_x_continuous(limits=c(0, 400)) +
+    xlab("Uncrowded Fruits Per Plant") +
+    ylab("Crowded Fruits Per Plant") +
+    theme_bw() +
+    theme(axis.text=element_text(size=12, face = "bold"),
+        axis.title=element_text(size=16,face="bold"))
+
