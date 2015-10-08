@@ -419,7 +419,7 @@ head(field_2014)
 plot()
 
 fruitnumber_lmer3 <- lmer(pod.number ~ density_trt*RIL.x 
-	              + (1|blk), data = field_data, REML = FALSE)
+	              + (1|blk), data = field_2014, REML = FALSE)
 fruitnumber_lmer3
 
 library(lmerTest)
@@ -440,14 +440,22 @@ colnames(fruits_lsmeans_2)[5] <- paste("SE")
 head(fruits_lsmeans_2)
 
 fruits_un <- subset(fruits_lsmeans_2, density_trt == "UN")
+
 fruits_cr <- subset(fruits_lsmeans_2, density_trt == "CR")
 head(fruits_un)
+head(fruits_cr)
+fruits_un$area <- fruits_un$Estimate*126
+fruits_cr$area <- fruits_cr$Estimate*640
+
 
 fruits <- merge(fruits_un, fruits_cr, by = "RIL.x")
 head(fruits)
-colnames(fruits)[c(3,12)] <- paste(c("UN_fruits", "CR_fruits"))
+colnames(fruits)
+colnames(fruits)[c(3,13)] <- paste(c("UN_fruits", "CR_fruits"))
+colnames(fruits)[c(11,21)] <- paste(c("UN_fruits_area", "CR_fruits_area"))
+str(fruits)
 
-
+library(ggplot2)
 plot(fruits$UN_fruits)
 ggplot(fruits, aes(x=UN_fruits, y=CR_fruits)) +
     geom_point(shape=1) +    # Use hollow circles
@@ -457,6 +465,21 @@ ggplot(fruits, aes(x=UN_fruits, y=CR_fruits)) +
     scale_x_continuous(limits=c(0, 400)) +
     xlab("Uncrowded Fruits Per Plant") +
     ylab("Crowded Fruits Per Plant") +
+    theme_bw() +
+    theme(axis.text=element_text(size=12, face = "bold"),
+        axis.title=element_text(size=16,face="bold"))
+
+
+
+
+ggplot(fruits, aes(x = UN_fruits_area, y = CR_fruits_area)) +
+    geom_point(shape=1) +    # Use hollow circles
+    geom_smooth(method=lm)  +  
+    geom_abline(intercept = 0, colour = "red", size = 1) +
+    scale_y_continuous(limits=c(0, 60000)) +
+    scale_x_continuous(limits=c(0, 60000)) +
+    xlab(expression(bold(paste(Uncrowded~Fruits~per,~m^-2)))) +
+    ylab(expression(bold(paste(Crowded~Fruits~per,~m^-2)))) +
     theme_bw() +
     theme(axis.text=element_text(size=12, face = "bold"),
         axis.title=element_text(size=16,face="bold"))
