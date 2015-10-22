@@ -475,53 +475,77 @@ ggplot(fruits, aes(x=UN_fruits, y=CR_fruits)) +
 
 head(fruits_lsmeans_2)
 fruits_lsmeans_2 <- unite(fruits_lsmeans_2, trt, c(density_trt, nutrient_trt), sep = "_", remove = FALSE)
-
-
+fruits_lsmeans_2$trt <- as.factor(fruits_lsmeans_2$trt, levels = c("UN_High", "UN_Low", "CR_High", "CR_Low"))
+fruits_lsmeans_2$trt <- relevel(fruits_lsmeans_2$trt, ref = "UN_High")
+levels(fruits_lsmeans_2$trt) <- paste(c("UN_High", "UN_Low", "CR_High", "CR_Low"))
+levels(fruits_lsmeans_2$trt)
 
 fruits_lsmeans_2$trt <- paste(c(fruits_lsmeans_2$density_trt,fruits_lsmeans_2$density_trt))
 
+ggplot(fruits, aes(x = UN_fruits_area, y = CR_fruits_area)) +
+    geom_point(shape=1) +    # Use hollow circles
+    geom_smooth(method=lm)  +  
+    geom_abline(intercept = 0, colour = "red", size = 1) +
+    scale_y_continuous(limits=c(0, 60000)) +
+    scale_x_continuous(limits=c(0, 60000)) +
+    xlab(expression(bold(paste(Uncrowded~Fruits~per,~m^-2)))) +
+    ylab(expression(bold(paste(Crowded~Fruits~per,~m^-2)))) +
+    theme_bw() +
+    theme(axis.text=element_text(size=12, face = "bold"),
+        axis.title=element_text(size=16,face="bold"))
+
+
+ggplot(fruits, aes(x = UN_fruits_area, y = CR_fruits_area)) +
+    geom_point(shape=1) +    # Use hollow circles
+    geom_smooth(method=lm)  +  
+    geom_abline(intercept = 0, colour = "red", size = 1) +
+    scale_y_continuous(limits=c(0, 60000)) +
+    scale_x_continuous(limits=c(0, 60000)) +
+    xlab(expression(bold(paste(Uncrowded~Fruits~per,~m^-2)))) +
+    ylab(expression(bold(paste(Crowded~Fruits~per,~m^-2)))) +
+    theme_bw() +
+    theme(axis.text=element_text(size=12, face = "bold"),
+        axis.title=element_text(size=16,face="bold"))
+
+
+# figure for research proposal
+limits <- aes(ymax= Estimate + SE, ymin = Estimate - SE)
+head(limits)
+dodge <- position_dodge(width=0.9)
+
 
 ggplot(fruits_lsmeans_2) +
-    geom_point(aes(x = RIL.x, y = Estimate, color = trt), size = 5 )  +
-    geom_errorbar(aes(ymin=Estimate - SE, ymax=Estimate+SE))
-
-    # Use hollow circles
-    geom_smooth(method=lm)  +  
-    geom_abline(intercept = 0, colour = "red", size = 1) +
-    scale_y_continuous(limits=c(0, 400)) +
-    scale_x_continuous(limits=c(0, 400)) +
-    xlab("Uncrowded Fruits Per Plant") +
-    ylab("Crowded Fruits Per Plant") +
+    geom_pointrange(mapping=aes(x = RIL.x, y = Estimate, ymax= Estimate + SE, ymin = Estimate - SE, color = trt), size = 1.5) + 
+    #coord_flip() +
+    xlab("Genotype") +
+    ylab("Pod Number") +
     theme_bw() +
     theme(axis.text=element_text(size=12, face = "bold"),
         axis.title=element_text(size=16,face="bold"))
 
+#subset for only a few genotypes
+head(fruits_lsmeans_2)
+names(fruits_lsmeans_2)
+rils <- c("IMB211", "R500", "RIL_143", "RIL_182", "RIL_207")
+rils
+fruits_2 <- fruits_lsmeans_2[fruits_lsmeans_2$RIL.x %in% rils,]
+fruits_2 <- subset(fruits_lsmeans_2, RIL.x = c("IMB211", "R500", "RIL_124", "RIL_182", "RIL_207"))
+head(fruits_2)
+fruits_2
 
-
-ggplot(fruits, aes(x = UN_fruits_area, y = CR_fruits_area)) +
-    geom_point(shape=1) +    # Use hollow circles
-    geom_smooth(method=lm)  +  
-    geom_abline(intercept = 0, colour = "red", size = 1) +
-    scale_y_continuous(limits=c(0, 60000)) +
-    scale_x_continuous(limits=c(0, 60000)) +
-    xlab(expression(bold(paste(Uncrowded~Fruits~per,~m^-2)))) +
-    ylab(expression(bold(paste(Crowded~Fruits~per,~m^-2)))) +
+ggplot(fruits_2) +
+    geom_pointrange(mapping=aes(x = RIL.x, y = Estimate, ymax= Estimate + SE, ymin = Estimate - SE, color = trt), size = 2) + 
+    # coord_flip() +
+    xlab("Genotype") +
+    ylab("Pod Number") +
     theme_bw() +
-    theme(axis.text=element_text(size=12, face = "bold"),
-        axis.title=element_text(size=16,face="bold"))
-
-
-ggplot(fruits, aes(x = UN_fruits_area, y = CR_fruits_area)) +
-    geom_point(shape=1) +    # Use hollow circles
-    geom_smooth(method=lm)  +  
-    geom_abline(intercept = 0, colour = "red", size = 1) +
-    scale_y_continuous(limits=c(0, 60000)) +
-    scale_x_continuous(limits=c(0, 60000)) +
-    xlab(expression(bold(paste(Uncrowded~Fruits~per,~m^-2)))) +
-    ylab(expression(bold(paste(Crowded~Fruits~per,~m^-2)))) +
-    theme_bw() +
-    theme(axis.text=element_text(size=12, face = "bold"),
-        axis.title=element_text(size=16,face="bold"))
+    theme(axis.text=element_text(size=16, face = "bold"),
+        axis.title=element_text(size=18,face="bold"),
+        legend.title = element_blank(),
+        legend.position = c(0.15, 0.9), 
+        legend.text = element_text(size=14, face="bold"), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 
 
 
