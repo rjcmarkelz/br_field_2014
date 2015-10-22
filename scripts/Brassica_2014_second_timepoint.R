@@ -2,7 +2,7 @@
 library(lme4)
 library(lsmeans)
 library(ggplot2)
-setwd("~/git.repos/brassica_field_2014/raw_data/")
+setwd("~/git.repos/brassica_field_2014_gh/raw_data/")
 
 field_2014 <- read.table("Brapa_2014_Field_data_timpoint2.csv", 
 	                    header=TRUE, sep = ",")
@@ -418,7 +418,7 @@ library(lme4)
 head(field_2014)
 plot()
 
-fruitnumber_lmer3 <- lmer(pod.number ~ density_trt*RIL.x 
+fruitnumber_lmer3 <- lmer(pod.number ~ density_trt*RIL.x*nutrient_trt 
 	              + (1|blk), data = field_2014, REML = FALSE)
 fruitnumber_lmer3
 
@@ -431,9 +431,11 @@ fruits_lsmeans_1 <- as.data.frame(fruits_lsmeans[[1]])
 head(fruits_lsmeans_1)
 
 fruits_lsmeans_1$rows <- 1:nrow(fruits_lsmeans_1)
-fruits_lsmeans_1
-fruits_lsmeans_2 <- subset(fruits_lsmeans_1, rows > 18)
+rownames(fruits_lsmeans_1)
+fruits_lsmeans_2 <- subset(fruits_lsmeans_1, rows > 88)
 str(fruits_lsmeans_2)
+fruits_lsmeans_2
+
 
 fruits_lsmeans_2$density_trt <- relevel(fruits_lsmeans_2$density_trt, ref = "UN")
 colnames(fruits_lsmeans_2)[5] <- paste("SE")
@@ -456,6 +458,7 @@ colnames(fruits)[c(11,21)] <- paste(c("UN_fruits_area", "CR_fruits_area"))
 str(fruits)
 
 library(ggplot2)
+library(tidyr)
 plot(fruits$UN_fruits)
 ggplot(fruits, aes(x=UN_fruits, y=CR_fruits)) +
     geom_point(shape=1) +    # Use hollow circles
@@ -470,6 +473,29 @@ ggplot(fruits, aes(x=UN_fruits, y=CR_fruits)) +
         axis.title=element_text(size=16,face="bold"))
 
 
+head(fruits_lsmeans_2)
+fruits_lsmeans_2 <- unite(fruits_lsmeans_2, trt, c(density_trt, nutrient_trt), sep = "_", remove = FALSE)
+
+
+
+fruits_lsmeans_2$trt <- paste(c(fruits_lsmeans_2$density_trt,fruits_lsmeans_2$density_trt))
+
+
+ggplot(fruits_lsmeans_2) +
+    geom_point(aes(x = RIL.x, y = Estimate, color = trt), size = 5 )  +
+    geom_errorbar(aes(ymin=Estimate - SE, ymax=Estimate+SE))
+
+    # Use hollow circles
+    geom_smooth(method=lm)  +  
+    geom_abline(intercept = 0, colour = "red", size = 1) +
+    scale_y_continuous(limits=c(0, 400)) +
+    scale_x_continuous(limits=c(0, 400)) +
+    xlab("Uncrowded Fruits Per Plant") +
+    ylab("Crowded Fruits Per Plant") +
+    theme_bw() +
+    theme(axis.text=element_text(size=12, face = "bold"),
+        axis.title=element_text(size=16,face="bold"))
+
 
 
 ggplot(fruits, aes(x = UN_fruits_area, y = CR_fruits_area)) +
@@ -483,4 +509,19 @@ ggplot(fruits, aes(x = UN_fruits_area, y = CR_fruits_area)) +
     theme_bw() +
     theme(axis.text=element_text(size=12, face = "bold"),
         axis.title=element_text(size=16,face="bold"))
+
+
+ggplot(fruits, aes(x = UN_fruits_area, y = CR_fruits_area)) +
+    geom_point(shape=1) +    # Use hollow circles
+    geom_smooth(method=lm)  +  
+    geom_abline(intercept = 0, colour = "red", size = 1) +
+    scale_y_continuous(limits=c(0, 60000)) +
+    scale_x_continuous(limits=c(0, 60000)) +
+    xlab(expression(bold(paste(Uncrowded~Fruits~per,~m^-2)))) +
+    ylab(expression(bold(paste(Crowded~Fruits~per,~m^-2)))) +
+    theme_bw() +
+    theme(axis.text=element_text(size=12, face = "bold"),
+        axis.title=element_text(size=16,face="bold"))
+
+
 
