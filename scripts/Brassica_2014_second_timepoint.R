@@ -526,7 +526,7 @@ ggplot(fruits_lsmeans_2) +
 #subset for only a few genotypes
 head(fruits_lsmeans_2)
 names(fruits_lsmeans_2)
-rils <- c("IMB211", "R500", "RIL_143", "RIL_182", "RIL_207")
+rils <- c("IMB211", "R500", "RIL_182", "RIL_207", "RIL_268")
 rils
 fruits_2 <- fruits_lsmeans_2[fruits_lsmeans_2$RIL.x %in% rils,]
 fruits_2 <- subset(fruits_lsmeans_2, RIL.x = c("IMB211", "R500", "RIL_124", "RIL_182", "RIL_207"))
