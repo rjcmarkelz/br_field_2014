@@ -475,9 +475,9 @@ ggplot(fruits, aes(x=UN_fruits, y=CR_fruits)) +
 
 head(fruits_lsmeans_2)
 fruits_lsmeans_2 <- unite(fruits_lsmeans_2, trt, c(density_trt, nutrient_trt), sep = "_", remove = FALSE)
-fruits_lsmeans_2$trt <- as.factor(fruits_lsmeans_2$trt, levels = c("UN_High", "UN_Low", "CR_High", "CR_Low"))
+fruits_lsmeans_2$trt <- as.factor(fruits_lsmeans_2$trt)
 fruits_lsmeans_2$trt <- relevel(fruits_lsmeans_2$trt, ref = "UN_High")
-levels(fruits_lsmeans_2$trt) <- paste(c("UN_High", "UN_Low", "CR_High", "CR_Low"))
+
 levels(fruits_lsmeans_2$trt)
 
 fruits_lsmeans_2$trt <- paste(c(fruits_lsmeans_2$density_trt,fruits_lsmeans_2$density_trt))
@@ -526,26 +526,31 @@ ggplot(fruits_lsmeans_2) +
 #subset for only a few genotypes
 head(fruits_lsmeans_2)
 names(fruits_lsmeans_2)
-rils <- c("IMB211", "R500", "RIL_182", "RIL_207", "RIL_268")
+rils <- c("IMB211", "R500", "RIL_182", "RIL_207", "RIL_93")
 rils
 fruits_2 <- fruits_lsmeans_2[fruits_lsmeans_2$RIL.x %in% rils,]
-fruits_2 <- subset(fruits_lsmeans_2, RIL.x = c("IMB211", "R500", "RIL_124", "RIL_182", "RIL_207"))
-head(fruits_2)
 fruits_2
+levels(fruits_2$trt)
+fruits_2$trt <- factor(fruits_2$trt, levels = c("UN_High", "UN_Low", "CR_High", "CR_Low"))
 
-ggplot(fruits_2) +
+fruits_2_plot <- ggplot(fruits_2) +
     geom_pointrange(mapping=aes(x = RIL.x, y = Estimate, ymax= Estimate + SE, ymin = Estimate - SE, color = trt), size = 2) + 
     # coord_flip() +
     xlab("Genotype") +
-    ylab("Pod Number") +
+    ylab("Measured Pod Number") +
     theme_bw() +
-    theme(axis.text=element_text(size=16, face = "bold"),
-        axis.title=element_text(size=18,face="bold"),
+    theme(axis.title.x = element_text(face="bold", size=26),
+        axis.text.x  = element_text(face="bold", size=22),
+        axis.title.y = element_text(face="bold", size=26),
+        axis.text.y  = element_text(face="bold", size=22),
         legend.title = element_blank(),
         legend.position = c(0.15, 0.9), 
-        legend.text = element_text(size=14, face="bold"), 
+        legend.text = element_text(size=20, face="bold"),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
-
-
+fruits_2_plot
+class(fruits_2_plot)
+setwd("~/git.repos/brassica_field_2014_gh/output/")
+?ggsave
+ggsave("small_dataset.pdf", width = 8, height = 8)
 
