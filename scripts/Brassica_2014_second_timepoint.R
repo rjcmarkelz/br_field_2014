@@ -526,7 +526,7 @@ ggplot(fruits_lsmeans_2) +
 #subset for only a few genotypes
 head(fruits_lsmeans_2)
 names(fruits_lsmeans_2)
-rils <- c("IMB211", "R500", "RIL_182", "RIL_207", "RIL_93")
+rils <- c("IMB211", "R500", "RIL_182", "RIL_207", "RIL_363")
 rils
 fruits_2 <- fruits_lsmeans_2[fruits_lsmeans_2$RIL.x %in% rils,]
 fruits_2
@@ -538,7 +538,7 @@ fruits_2_plot <- ggplot(fruits_2) +
     # coord_flip() +
     xlab("Genotype") +
     ylab("Measured Pod Number") +
-    theme_bw() +
+    theme_bw() + scale_colour_manual(values = c("black","blue", "red", "dark grey"))+ 
     theme(axis.title.x = element_text(face="bold", size=26),
         axis.text.x  = element_text(face="bold", size=22),
         axis.title.y = element_text(face="bold", size=26),
